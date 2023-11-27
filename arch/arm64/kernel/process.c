@@ -44,7 +44,6 @@
 
 #include <asm/alternative.h>
 #include <asm/arch_timer.h>
-#include <asm/compat.h>
 #include <asm/cpufeature.h>
 #include <asm/cacheflush.h>
 #include <asm/exec.h>
@@ -253,7 +252,7 @@ static void tls_thread_flush(void)
 	if (system_supports_tpidr2())
 		write_sysreg_s(0, SYS_TPIDR2_EL0);
 
-	if (is_compat_task()) {
+	if (is_a32_compat_task()) {
 		current->thread.uw.tp_value = 0;
 
 		/*
@@ -385,7 +384,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 			p->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
 
 		if (stack_start) {
-			if (is_compat_thread(task_thread_info(p)))
+			if (is_a32_compat_thread(task_thread_info(p)))
 				childregs->compat_sp = stack_start;
 			else
 				childregs->sp = stack_start;
@@ -440,7 +439,7 @@ static void tls_thread_switch(struct task_struct *next)
 {
 	tls_preserve_current_state();
 
-	if (is_compat_thread(task_thread_info(next)))
+	if (is_a32_compat_thread(task_thread_info(next)))
 		write_sysreg(next->thread.uw.tp_value, tpidrro_el0);
 	else
 		write_sysreg(0, tpidrro_el0);
@@ -817,7 +816,7 @@ int get_tsc_mode(unsigned long adr)
 {
 	unsigned int val;
 
-	if (is_compat_task())
+	if (is_a32_compat_task())
 		return -EINVAL;
 
 	if (test_thread_flag(TIF_TSC_SIGSEGV))
@@ -830,7 +829,7 @@ int get_tsc_mode(unsigned long adr)
 
 int set_tsc_mode(unsigned int val)
 {
-	if (is_compat_task())
+	if (is_a32_compat_task())
 		return -EINVAL;
 
 	return do_set_tsc_mode(val);
