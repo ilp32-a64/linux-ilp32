@@ -500,7 +500,7 @@ static void update_cntkctl_el1(struct task_struct *next)
 	    has_erratum_handler(read_cntvct_el0) ||
 	    (IS_ENABLED(CONFIG_ARM64_ERRATUM_1418040) &&
 	     this_cpu_has_cap(ARM64_WORKAROUND_1418040) &&
-	     is_compat_thread(ti)))
+	     is_a32_compat_thread(ti)))
 		sysreg_clear_set(cntkctl_el1, ARCH_TIMER_USR_VCT_ACCESS_EN, 0);
 	else
 		sysreg_clear_set(cntkctl_el1, 0, ARCH_TIMER_USR_VCT_ACCESS_EN);
