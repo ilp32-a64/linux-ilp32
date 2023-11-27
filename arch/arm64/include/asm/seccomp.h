@@ -10,12 +10,12 @@
 
 #include <asm/unistd_compat_32.h>
 
-#ifdef CONFIG_COMPAT
+#ifdef CONFIG_AARCH32_EL0
 #define __NR_seccomp_read_32		__NR_compat32_read
 #define __NR_seccomp_write_32		__NR_compat32_write
 #define __NR_seccomp_exit_32		__NR_compat32_exit
 #define __NR_seccomp_sigreturn_32	__NR_compat32_rt_sigreturn
-#endif /* CONFIG_COMPAT */
+#endif /* CONFIG_AARCH32_EL0 */
 
 #include <asm-generic/seccomp.h>
 

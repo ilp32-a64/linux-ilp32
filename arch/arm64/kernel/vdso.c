@@ -222,7 +222,7 @@ up_fail:
 	return PTR_ERR(ret);
 }
 
-#ifdef CONFIG_COMPAT
+#ifdef CONFIG_AARCH32_EL0
 /*
  * Create and map the vectors page for AArch32 tasks.
  */
@@ -400,7 +400,7 @@ out:
 	mmap_write_unlock(mm);
 	return ret;
 }
-#endif /* CONFIG_COMPAT */
+#endif /* CONFIG_AARCH32_EL0 */
 
 enum aarch64_map {
 	AA64_MAP_VVAR,
