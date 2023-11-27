@@ -223,6 +223,9 @@ ifdef CONFIG_COMPAT_VDSO
 	$(Q)$(MAKE) $(build)=arch/arm64/kernel/vdso32 \
 	arch/arm64/kernel/vdso32/vdso.so
 endif
+ifeq ($(CONFIG_ARM64_ILP32), y)
+	$(Q)$(MAKE) $(build)=arch/arm64/kernel/vdso-ilp32 include/generated/vdso-ilp32-offsets.h
+endif
 endif
 
 vdso-install-y				+= arch/arm64/kernel/vdso/vdso.so.dbg
