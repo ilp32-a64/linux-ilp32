@@ -2,5 +2,7 @@
 
 syscall_abis_32 +=
 syscall_abis_64 += renameat rlimit memfd_secret
+# ILP32: the generic table with the 32-bit ABI variants and time32 calls, compat entry points
+syscall_abis_ilp32 += common 32 time32 stat64 memfd_secret
 
 syscalltbl = arch/arm64/tools/syscall_%.tbl
