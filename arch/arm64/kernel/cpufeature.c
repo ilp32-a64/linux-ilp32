@@ -96,13 +96,13 @@
 static DECLARE_BITMAP(elf_hwcap, MAX_CPU_FEATURES) __read_mostly;
 
 #ifdef CONFIG_AARCH32_EL0
-#define COMPAT_ELF_HWCAP_DEFAULT	\
+#define AARCH32_EL0_ELF_HWCAP_DEFAULT \
 				(COMPAT_HWCAP_HALF|COMPAT_HWCAP_THUMB|\
 				 COMPAT_HWCAP_FAST_MULT|COMPAT_HWCAP_EDSP|\
 				 COMPAT_HWCAP_TLS|COMPAT_HWCAP_IDIV|\
 				 COMPAT_HWCAP_LPAE)
-unsigned int compat_elf_hwcap __read_mostly = COMPAT_ELF_HWCAP_DEFAULT;
-unsigned int compat_elf_hwcap2 __read_mostly;
+unsigned int a32_elf_hwcap __read_mostly = AARCH32_EL0_ELF_HWCAP_DEFAULT;
+unsigned int a32_elf_hwcap2 __read_mostly;
 #endif
 
 DECLARE_BITMAP(system_cpucaps, ARM64_NCAPS);
@@ -2321,10 +2321,10 @@ static void user_feature_fixup(void)
 
 static void elf_hwcap_fixup(void)
 {
-#ifdef CONFIG_COMPAT
+#ifdef CONFIG_AARCH32_EL0
 	if (cpus_have_cap(ARM64_WORKAROUND_1742098))
-		compat_elf_hwcap2 &= ~COMPAT_HWCAP2_AES;
-#endif /* CONFIG_COMPAT */
+		a32_elf_hwcap2 &= ~COMPAT_HWCAP2_AES;
+#endif /* CONFIG_AARCH32_EL0 */
 }
 
 #ifdef CONFIG_KVM
@@ -3134,10 +3134,10 @@ static void cap_set_elf_hwcap(const struct arm64_cpu_capabilities *cap)
 		break;
 #ifdef CONFIG_AARCH32_EL0
 	case CAP_COMPAT_HWCAP:
-		compat_elf_hwcap |= (u32)cap->hwcap;
+		a32_elf_hwcap |= (u32)cap->hwcap;
 		break;
 	case CAP_COMPAT_HWCAP2:
-		compat_elf_hwcap2 |= (u32)cap->hwcap;
+		a32_elf_hwcap2 |= (u32)cap->hwcap;
 		break;
 #endif
 	default:
@@ -3157,10 +3157,10 @@ static bool cpus_have_elf_hwcap(const struct arm64_cpu_capabilities *cap)
 		break;
 #ifdef CONFIG_AARCH32_EL0
 	case CAP_COMPAT_HWCAP:
-		rc = (compat_elf_hwcap & (u32)cap->hwcap) != 0;
+		rc = (a32_elf_hwcap & (u32)cap->hwcap) != 0;
 		break;
 	case CAP_COMPAT_HWCAP2:
-		rc = (compat_elf_hwcap2 & (u32)cap->hwcap) != 0;
+		rc = (a32_elf_hwcap2 & (u32)cap->hwcap) != 0;
 		break;
 #endif
 	default:
