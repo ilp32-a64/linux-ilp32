@@ -373,7 +373,7 @@ unwind_user_frame(struct frame_tail __user *tail, void *cookie,
 	return buftail.fp;
 }
 
-#ifdef CONFIG_COMPAT
+#ifdef CONFIG_AARCH32_EL0
 /*
  * The registers we're interested in are at the end of the variable
  * length saved register structure. The fp points at the end of this
@@ -419,7 +419,7 @@ unwind_compat_user_frame(struct compat_frame_tail __user *tail, void *cookie,
 
 	return (struct compat_frame_tail __user *)compat_ptr(buftail.fp) - 1;
 }
-#endif /* CONFIG_COMPAT */
+#endif /* CONFIG_AARCH32_EL0 */
 
 
 void arch_stack_walk_user(stack_trace_consume_fn consume_entry, void *cookie,
@@ -436,7 +436,7 @@ void arch_stack_walk_user(stack_trace_consume_fn consume_entry, void *cookie,
 		while (tail && !((unsigned long)tail & 0x7))
 			tail = unwind_user_frame(tail, cookie, consume_entry);
 	} else {
-#ifdef CONFIG_COMPAT
+#ifdef CONFIG_AARCH32_EL0
 		/* AARCH32 compat mode */
 		struct compat_frame_tail __user *tail;
 
