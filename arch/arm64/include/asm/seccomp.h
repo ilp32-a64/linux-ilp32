@@ -8,6 +8,7 @@
 #ifndef _ASM_SECCOMP_H
 #define _ASM_SECCOMP_H
 
+#include <asm/unistd.h>
 #include <asm/unistd_compat_32.h>
 
 #ifdef CONFIG_AARCH32_EL0
@@ -16,6 +17,36 @@
 #define __NR_seccomp_exit_32		__NR_compat32_exit
 #define __NR_seccomp_sigreturn_32	__NR_compat32_rt_sigreturn
 #endif /* CONFIG_AARCH32_EL0 */
+
+#ifdef CONFIG_COMPAT
+#ifndef __COMPAT_SYSCALL_NR
+
+static inline const int *get_compat_mode1_syscalls(void)
+{
+#ifdef CONFIG_AARCH32_EL0
+	static const int mode1_syscalls_a32[] = {
+		__NR_seccomp_read_32, __NR_seccomp_write_32,
+		__NR_seccomp_exit_32, __NR_seccomp_sigreturn_32,
+		0, /* null terminated */
+	};
+#endif
+	static const int mode1_syscalls_ilp32[] = {
+		__NR_read, __NR_write,
+		__NR_exit, __NR_rt_sigreturn,
+		0, /* null terminated */
+	};
+
+#ifdef CONFIG_AARCH32_EL0
+	if (is_a32_compat_task())
+		return mode1_syscalls_a32;
+#endif
+	return mode1_syscalls_ilp32;
+}
+
+#define get_compat_mode1_syscalls get_compat_mode1_syscalls
+
+#endif
+#endif
 
 #include <asm-generic/seccomp.h>
 
