@@ -284,10 +284,10 @@ bool try_handle_aarch32_break(struct pt_regs *regs)
 	bool bp = false;
 	void __user *pc = (void __user *)instruction_pointer(regs);
 
-	if (!compat_user_mode(regs))
+	if (!a32_user_mode(regs))
 		return false;
 
-	if (compat_thumb_mode(regs)) {
+	if (a32_thumb_mode(regs)) {
 		/* get 16-bit Thumb instruction */
 		__le16 instr;
 		get_user(instr, (__le16 __user *)pc);

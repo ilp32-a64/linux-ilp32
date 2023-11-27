@@ -380,21 +380,21 @@ unwind_user_frame(struct frame_tail __user *tail, void *cookie,
  * The registers we're interested in are at the end of the variable
  * length saved register structure. The fp points at the end of this
  * structure so the address of this struct is:
- * (struct compat_frame_tail *)(xxx->fp)-1
+ * (struct a32_frame_tail *)(xxx->fp)-1
  *
  * This code has been adapted from the ARM OProfile support.
  */
-struct compat_frame_tail {
-	compat_uptr_t	fp; /* a (struct compat_frame_tail *) in compat mode */
+struct a32_frame_tail {
+	compat_uptr_t	fp; /* a (struct a32_frame_tail *) in compat mode */
 	u32		sp;
 	u32		lr;
 } __attribute__((packed));
 
-static struct compat_frame_tail __user *
-unwind_compat_user_frame(struct compat_frame_tail __user *tail, void *cookie,
+static struct a32_frame_tail __user *
+unwind_compat_user_frame(struct a32_frame_tail __user *tail, void *cookie,
 				stack_trace_consume_fn consume_entry)
 {
-	struct compat_frame_tail buftail;
+	struct a32_frame_tail buftail;
 	unsigned long err;
 
 	/* Also check accessibility of one struct frame_tail beyond */
@@ -415,11 +415,11 @@ unwind_compat_user_frame(struct compat_frame_tail __user *tail, void *cookie,
 	 * Frame pointers should strictly progress back up the stack
 	 * (towards higher addresses).
 	 */
-	if (tail + 1 >= (struct compat_frame_tail __user *)
+	if (tail + 1 >= (struct a32_frame_tail __user *)
 			compat_ptr(buftail.fp))
 		return NULL;
 
-	return (struct compat_frame_tail __user *)compat_ptr(buftail.fp) - 1;
+	return (struct a32_frame_tail __user *)compat_ptr(buftail.fp) - 1;
 }
 #endif /* CONFIG_AARCH32_EL0 */
 
@@ -430,7 +430,7 @@ void arch_stack_walk_user(stack_trace_consume_fn consume_entry, void *cookie,
 	if (!consume_entry(cookie, regs->pc))
 		return;
 
-	if (!compat_user_mode(regs)) {
+	if (!a32_user_mode(regs)) {
 		/* AARCH64 mode */
 		struct frame_tail __user *tail;
 
@@ -440,9 +440,9 @@ void arch_stack_walk_user(stack_trace_consume_fn consume_entry, void *cookie,
 	} else {
 #ifdef CONFIG_AARCH32_EL0
 		/* AARCH32 compat mode */
-		struct compat_frame_tail __user *tail;
+		struct a32_frame_tail __user *tail;
 
-		tail = (struct compat_frame_tail __user *)regs->compat_fp - 1;
+		tail = (struct a32_frame_tail __user *)regs->compat_fp - 1;
 		while (tail && !((unsigned long)tail & 0x3))
 			tail = unwind_compat_user_frame(tail, cookie, consume_entry);
 #endif
