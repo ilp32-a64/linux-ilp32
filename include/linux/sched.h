@@ -47,6 +47,7 @@
 #include <linux/livepatch_sched.h>
 #include <linux/uidgid_types.h>
 #include <asm/kmap_size.h>
+#include <linux/thread_bits.h>
 
 /* task_struct member predeclarations (sorted alphabetically): */
 struct audit_context;
