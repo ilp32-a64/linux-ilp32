@@ -67,7 +67,7 @@ CPPFLAGS_vdso-ilp32.lds += -P -C -U$(ARCH) -mabi=ilp32
 $(obj)/vdso-ilp32.o : $(obj)/vdso-ilp32.so
 
 # Link rule for the .so file, .lds has to be first
-$(obj)/vdso-ilp32.so.dbg: $(obj)/vdso-ilp32.lds $(obj-ilp32-vdso)
+$(obj)/vdso-ilp32.so.dbg: $(obj)/vdso-ilp32.lds $(obj-ilp32-vdso) FORCE
 	$(call if_changed,vdso-ilp32ld_and_vdso_check)
 
 # Strip rule for the .so file
@@ -94,7 +94,7 @@ $(obj)/sigreturn-ilp32.o: $(src)/../vdso/sigreturn.S
 
 # Actual build commands
 quiet_cmd_vdso-ilp32ld_and_vdso_check = LD      $@
-      cmd_vdso-ilp32ld_and_vdso_check = $(CC) $(c_flags) -mabi=ilp32 -shared -Wl,-n -Wl,-T $^ -o $@
+      cmd_vdso-ilp32ld_and_vdso_check = $(CC) $(c_flags) -mabi=ilp32 -shared -Wl,-n -Wl,-T $(real-prereqs) -o $@
 quiet_cmd_vdso-ilp32cc = VDSOILP32C $@
       cmd_vdso-ilp32cc= $(CC) $(c_flags) -mabi=ilp32 -c -o $@ $<
 quiet_cmd_vdso-ilp32as = VDSOILP32A $@
