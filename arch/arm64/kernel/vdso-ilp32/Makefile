@@ -94,7 +94,7 @@ $(obj)/sigreturn-ilp32.o: $(src)/../vdso/sigreturn.S
 
 # Actual build commands
 quiet_cmd_vdso-ilp32ld_and_vdso_check = LD      $@
-      cmd_vdso-ilp32ld_and_vdso_check = $(CC) $(c_flags) -mabi=ilp32 -Wl,-n -Wl,-T $^ -o $@
+      cmd_vdso-ilp32ld_and_vdso_check = $(CC) $(c_flags) -mabi=ilp32 -shared -Wl,-n -Wl,-T $^ -o $@
 quiet_cmd_vdso-ilp32cc = VDSOILP32C $@
       cmd_vdso-ilp32cc= $(CC) $(c_flags) -mabi=ilp32 -c -o $@ $<
 quiet_cmd_vdso-ilp32as = VDSOILP32A $@
