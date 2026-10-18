@@ -77,6 +77,7 @@ VERSION
 		__kernel_rt_sigreturn;
 		__kernel_gettimeofday;
 		__kernel_clock_gettime;
+		__kernel_clock_gettime64;
 		__kernel_clock_getres;
 	local: *;
 	};
