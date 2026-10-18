@@ -14,6 +14,19 @@
 
 #define VDSO_HAS_CLOCK_GETRES		1
 
+#if defined(__aarch64__) && defined(__ILP32__)
+/*
+ * ILP32 vDSO: ILP32 tasks use the asm-generic system call table with a 32-bit
+ * time_t, so __NR_clock_gettime/__NR_clock_getres are the time32 calls; the
+ * 64-bit time versions are clock_gettime64 (403) and clock_getres_time64 (406).
+ */
+#define VDSO_NR_CLOCK_GETTIME		403
+#define VDSO_NR_CLOCK_GETRES		406
+#else
+#define VDSO_NR_CLOCK_GETTIME		__NR_clock_gettime
+#define VDSO_NR_CLOCK_GETRES		__NR_clock_getres
+#endif
+
 static __always_inline
 int gettimeofday_fallback(struct __kernel_old_timeval *_tv,
 			  struct timezone *_tz)
@@ -38,7 +51,7 @@ long clock_gettime_fallback(clockid_t _clkid, struct __kernel_timespec *_ts)
 	register struct __kernel_timespec *ts asm("x1") = _ts;
 	register clockid_t clkid asm("x0") = _clkid;
 	register long ret asm ("x0");
-	register long nr asm("x8") = __NR_clock_gettime;
+	register long nr asm("x8") = VDSO_NR_CLOCK_GETTIME;
 
 	asm volatile(
 	"       svc #0\n"
@@ -55,6 +68,42 @@ int clock_getres_fallback(clockid_t _clkid, struct __kernel_timespec *_ts)
 	register struct __kernel_timespec *ts asm("x1") = _ts;
 	register clockid_t clkid asm("x0") = _clkid;
 	register long ret asm ("x0");
+	register long nr asm("x8") = VDSO_NR_CLOCK_GETRES;
+
+	asm volatile(
+	"       svc #0\n"
+	: "=r" (ret)
+	: "r" (clkid), "r" (ts), "r" (nr)
+	: "memory");
+
+	return ret;
+}
+
+#if defined(__aarch64__) && defined(__ILP32__)
+/* time32 fallbacks for the ILP32 vDSO (lib/vdso BUILD_VDSO32) */
+static __always_inline
+int clock_gettime32_fallback(clockid_t _clkid, struct old_timespec32 *_ts)
+{
+	register struct old_timespec32 *ts asm("x1") = _ts;
+	register clockid_t clkid asm("x0") = _clkid;
+	register long ret asm ("x0");
+	register long nr asm("x8") = __NR_clock_gettime;
+
+	asm volatile(
+	"       svc #0\n"
+	: "=r" (ret)
+	: "r" (clkid), "r" (ts), "r" (nr)
+	: "memory");
+
+	return ret;
+}
+
+static __always_inline
+int clock_getres32_fallback(clockid_t _clkid, struct old_timespec32 *_ts)
+{
+	register struct old_timespec32 *ts asm("x1") = _ts;
+	register clockid_t clkid asm("x0") = _clkid;
+	register long ret asm ("x0");
 	register long nr asm("x8") = __NR_clock_getres;
 
 	asm volatile(
@@ -65,6 +114,7 @@ int clock_getres_fallback(clockid_t _clkid, struct __kernel_timespec *_ts)
 
 	return ret;
 }
+#endif
 
 static __always_inline u64 __arch_get_hw_counter(s32 clock_mode,
 						 const struct vdso_data *vd)

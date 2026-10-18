@@ -45,7 +45,8 @@ UBSAN_SANITIZE			:= n
 OBJECT_FILES_NON_STANDARD	:= y
 KCOV_INSTRUMENT			:= n
 
-CFLAGS_vgettimeofday-ilp32.o = -O2 -mcmodel=tiny -fasynchronous-unwind-tables -mabi=ilp32
+# BUILD_VDSO32: the time32 functions of lib/vdso (ILP32 has a 32-bit time_t)
+CFLAGS_vgettimeofday-ilp32.o = -O2 -mcmodel=tiny -fasynchronous-unwind-tables -mabi=ilp32 -DBUILD_VDSO32
 
 ifneq ($(c-gettimeofday-y),)
   CFLAGS_vgettimeofday-ilp32.o += -include $(c-gettimeofday-y)
@@ -88,7 +89,7 @@ quiet_cmd_vdsosym = VDSOSYM $@
 include/generated/vdso-ilp32-offsets.h: $(obj)/vdso-ilp32.so.dbg FORCE
 	$(call if_changed,vdsosym)
 
-$(obj)/vgettimeofday-ilp32.o: $(src)/../vdso/vgettimeofday.c
+$(obj)/vgettimeofday-ilp32.o: $(src)/vgettimeofday.c
 	$(call if_changed_dep,vdso-ilp32cc)
 
 $(obj)/note-ilp32.o: $(src)/../vdso/note.S
