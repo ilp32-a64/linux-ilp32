@@ -588,7 +588,7 @@ config ARM64_ERRATUM_834220
 
 config ARM64_ERRATUM_1742098
 	bool "Cortex-A57/A72: 1742098: ELR recorded incorrectly on interrupt taken between cryptographic instructions in a sequence"
-	depends on COMPAT
+	depends on AARCH32_EL0
 	default y
 	help
 	  This option removes the AES hwcap for aarch32 user-space to
@@ -654,7 +654,7 @@ config ARM64_ERRATUM_1024718
 config ARM64_ERRATUM_1418040
 	bool "Cortex-A76/Neoverse-N1: MRC read following MRRC read of specific Generic Timer in AArch32 might give incorrect result"
 	default y
-	depends on COMPAT
+	depends on AARCH32_EL0
 	help
 	  This option adds a workaround for ARM Cortex-A76/Neoverse-N1
 	  errata 1188873 and 1418040.
@@ -1936,7 +1936,7 @@ config SETEND_EMULATION
 	  If unsure, say Y
 endif # ARMV8_DEPRECATED
 
-endif # COMPAT
+endif # AARCH32_EL0
 
 menu "ARMv8.1 architectural features"
 
