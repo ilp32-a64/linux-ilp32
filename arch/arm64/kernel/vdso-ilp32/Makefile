@@ -30,8 +30,7 @@ ldflags-y := -shared -nostdlib -soname=linux-ilp32-vdso.so.1 --hash-style=sysv	\
 ccflags-y := -fno-common -fno-builtin -fno-stack-protector -ffixed-x18
 ccflags-y += -DDISABLE_BRANCH_PROFILING
 #ccflags-y += -nostdlib
-ccflags-y += -nostdlib -Wl,-soname=linux-ilp32-vdso.so.1 \
-		$(call cc-ldoption, -Wl$(comma)--hash-style=sysv)
+ccflags-y += -nostdlib -Wl,-soname=linux-ilp32-vdso.so.1
 
 # as the LP64 vDSO: no ftrace, SCS, randstruct, plugins, LTO or CFI, and no -Wmissing-prototypes or
 # -Wmissing-declarations so that CONFIG_WERROR builds
@@ -100,8 +99,13 @@ $(obj)/sigreturn-ilp32.o: $(src)/../vdso/sigreturn.S
 	$(call if_changed_dep,vdso-ilp32as)
 
 # Actual build commands
+# The vDSO is linked through $(CC) (-mabi=ilp32 selects the ELF32 emulation), so ldflags-y is passed with
+# -Wl, like the LP64 vDSO gets it through $(LD). -shared is also given to the driver itself, which would
+# otherwise add -pie when it defaults to PIE.
+ldflags-ilp32 := $(addprefix -Wl$(comma),$(filter-out -T,$(ldflags-y)))
 quiet_cmd_vdso-ilp32ld_and_vdso_check = LD      $@
-      cmd_vdso-ilp32ld_and_vdso_check = $(CC) $(c_flags) -mabi=ilp32 -shared -Wl,-n -Wl,-T $(real-prereqs) -o $@
+      cmd_vdso-ilp32ld_and_vdso_check = $(CC) $(c_flags) -mabi=ilp32 -shared $(ldflags-ilp32) \
+					  -Wl,-T $(real-prereqs) -o $@
 quiet_cmd_vdso-ilp32cc = VDSOILP32C $@
       cmd_vdso-ilp32cc= $(CC) $(c_flags) -mabi=ilp32 -c -o $@ $<
 quiet_cmd_vdso-ilp32as = VDSOILP32A $@
