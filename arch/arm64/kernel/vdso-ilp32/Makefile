@@ -83,13 +83,13 @@ quiet_cmd_vdsosym = VDSOSYM $@
 include/generated/vdso-ilp32-offsets.h: $(obj)/vdso-ilp32.so.dbg FORCE
 	$(call if_changed,vdsosym)
 
-$(obj)/vgettimeofday-ilp32.o: $(src)/vgettimeofday.c
+$(obj)/vgettimeofday-ilp32.o: $(src)/vgettimeofday.c FORCE
 	$(call if_changed_dep,vdso-ilp32cc)
 
-$(obj)/note-ilp32.o: $(src)/../vdso/note.S
+$(obj)/note-ilp32.o: $(src)/../vdso/note.S FORCE
 	$(call if_changed_dep,vdso-ilp32as)
 
-$(obj)/sigreturn-ilp32.o: $(src)/../vdso/sigreturn.S
+$(obj)/sigreturn-ilp32.o: $(src)/../vdso/sigreturn.S FORCE
 	$(call if_changed_dep,vdso-ilp32as)
 
 # Actual build commands
