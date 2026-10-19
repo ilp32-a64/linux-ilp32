@@ -6,9 +6,7 @@
 # Heavily based on the vDSO Makefiles for other archs.
 #
 
-# Absolute relocation type $(ARCH_REL_TYPE_ABS) needs to be defined before
-# the inclusion of generic Makefile.
-ARCH_REL_TYPE_ABS := R_AARCH64_JUMP_SLOT|R_AARCH64_GLOB_DAT|R_AARCH64_ABS64
+# Include the generic Makefile to check the built vdso.
 include $(srctree)/lib/vdso/Makefile
 
 obj-ilp32-vdso := vgettimeofday-ilp32.o note-ilp32.o sigreturn-ilp32.o
@@ -104,7 +102,8 @@ $(obj)/sigreturn-ilp32.o: $(src)/../vdso/sigreturn.S
 ldflags-ilp32 := $(addprefix -Wl$(comma),$(filter-out -T,$(ldflags-y)))
 quiet_cmd_vdso-ilp32ld_and_vdso_check = LD      $@
       cmd_vdso-ilp32ld_and_vdso_check = $(CC) $(c_flags) -mabi=ilp32 -shared $(ldflags-ilp32) \
-					  -Wl,-T $(real-prereqs) -o $@
+					  -Wl,-T $(real-prereqs) -o $@; \
+					  $(cmd_vdso_check)
 quiet_cmd_vdso-ilp32cc = VDSOILP32C $@
       cmd_vdso-ilp32cc= $(CC) $(c_flags) -mabi=ilp32 -c -o $@ $<
 quiet_cmd_vdso-ilp32as = VDSOILP32A $@
