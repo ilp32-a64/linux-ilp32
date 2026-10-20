@@ -41,6 +41,9 @@ config BINFMT_ELF_KUNIT_TEST
 config COMPAT_BINFMT_ELF
 	def_bool y
 	depends on COMPAT && BINFMT_ELF
+	# arm64 builds its AArch32 and ILP32 ELF loaders from compat_binfmt_elf.c
+	# itself (arch/arm64/kernel/binfmt_elf32.c, binfmt_ilp32.c)
+	depends on !ARM64
 	select ELFCORE
 
 config ARCH_BINFMT_ELF_STATE
