@@ -66,8 +66,8 @@ CONFIG_COMPAT_32BIT_TIME=y    # ILP32 glibc 2.30 has a 32-bit time_t
 
 ## Testing
 
-[ilp32-a64/ilp32-test](https://github.com/ilp32-a64/ilp32-test) builds an ILP32 toolchain (GCC 10.5,
-glibc 2.30 from [ilp32-a64/glibc](https://github.com/ilp32-a64/glibc)) and runs ILP32 and AArch32 test
+[ilp32-a64/test-ilp32](https://github.com/ilp32-a64/test-ilp32) builds an ILP32 toolchain (GCC 10.5,
+glibc 2.30 from [ilp32-a64/glibc-ilp32](https://github.com/ilp32-a64/glibc-ilp32)) and runs ILP32 and AArch32 test
 programs on these kernels in QEMU, with AArch32 on and off. `ilp32-6.12`, `ilp32-6.6` and `ilp32-5.10`
 pass.
 
