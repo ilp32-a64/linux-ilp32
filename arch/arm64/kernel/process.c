@@ -431,7 +431,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 void tls_preserve_current_state(void)
 {
 	*task_user_tls(current) = read_sysreg(tpidr_el0);
-	if (system_supports_tpidr2() && !is_compat_task())
+	if (system_supports_tpidr2() && !is_a32_compat_task())
 		current->thread.tpidr2_el0 = read_sysreg_s(SYS_TPIDR2_EL0);
 }
 
