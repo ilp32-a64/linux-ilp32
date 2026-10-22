@@ -10,12 +10,14 @@ This default branch only holds this file. The kernel is in the branches below.
 
 ## Branches
 
-**`ilp32-6.12.y` is the only maintained branch.** It is on the 6.12 stable series (`v6.12.114`); all new
-work goes there and all tests run on it.
+**`ilp32-6.12.y` is the only maintained branch.** It is on the 6.12 stable series (`v6.12.115`); all new
+work goes there and all tests run on it. It is rebased when it moves to a new stable release, so its
+history is rewritten then. The previous tip stays available as a tag: `ilp32-6.12.114` (`64b6f40074`) is the
+source of the Debian packages 6.12.114-1+ilp32a64.1 and .2.
 
 | Branch | Base | Status |
 |---|---|---|
-| `ilp32-6.12.y` | `v6.12.114` | **maintained**: the ILP32 series on 6.12 stable, with the fixes below |
+| `ilp32-6.12.y` | `v6.12.115` | **maintained**: the ILP32 series on 6.12 stable, with the fixes below |
 | `ilp32-6.12` | `v6.12` | deprecated: the first 6.12 port, without the stable updates and the later fixes |
 | `ilp32-6.6.y` | `v6.6.160` | deprecated |
 | `ilp32-6.6` | `v6.6` | deprecated |
