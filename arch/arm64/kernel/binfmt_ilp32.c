@@ -30,6 +30,10 @@
 #define elf_note	elf32_note
 #define elf_addr_t	Elf32_Addr
 
+/* GNU property notes of ELF32 files are 4-byte aligned */
+#undef	ELF_GNU_PROPERTY_ALIGN
+#define ELF_GNU_PROPERTY_ALIGN	ELF32_GNU_PROPERTY_ALIGN
+
 /*
  * Some data types as stored in coredump.
  */
