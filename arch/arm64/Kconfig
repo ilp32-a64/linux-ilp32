@@ -1779,7 +1779,6 @@ config ARM64_TAGGED_ADDR_ABI
 
 config ARM64_ILP32
 	bool "Kernel support for ILP32"
-	depends on !ARM64_PTR_AUTH
 	help
 	  This option enables support for AArch64 ILP32 user space.  ILP32
 	  is an ABI where long and pointers are 32bits but it uses the AARCH64

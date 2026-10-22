@@ -50,6 +50,17 @@ ifneq ($(c-gettimeofday-y),)
   CFLAGS_vgettimeofday-ilp32.o += -include $(c-gettimeofday-y)
 endif
 
+# The return address signing flags of the kernel (ARM64_PTR_AUTH_KERNEL) are for LP64 code: GCC does not
+# support return address signing with -mabi=ilp32. Keep the BTI landing pads when the vDSO pages are
+# mapped as guarded pages (ARM64_BTI_KERNEL).
+CFLAGS_REMOVE_vgettimeofday-ilp32.o += -mbranch-protection=pac-ret+bti -mbranch-protection=pac-ret \
+				       -msign-return-address=non-leaf
+ifeq ($(CONFIG_ARM64_BTI_KERNEL),y)
+  CFLAGS_vgettimeofday-ilp32.o += -mbranch-protection=bti
+else
+  CFLAGS_vgettimeofday-ilp32.o += $(call cc-option,-mbranch-protection=none)
+endif
+
 # Clang versions less than 8 do not support -mcmodel=tiny
 ifeq ($(CONFIG_CC_IS_CLANG), y)
   ifeq ($(shell test $(CONFIG_CLANG_VERSION) -lt 80000; echo $$?),0)
