@@ -17,7 +17,6 @@
 	set_thread_flag(TIF_32BIT);					\
 })
 
-#define COMPAT_ARCH_DLINFO
 #define COMPAT_ELF_HWCAP		(a32_elf_hwcap)
 #define COMPAT_ELF_HWCAP2		(a32_elf_hwcap2)
 
