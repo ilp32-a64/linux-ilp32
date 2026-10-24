@@ -17,13 +17,14 @@
 #ifndef __ASM_BITSPERLONG_H
 #define __ASM_BITSPERLONG_H
 
-#if defined(__LP64__)
-/* Assuming __LP64__ will be defined for native ELF64's and not for ILP32. */
-#  define __BITS_PER_LONG 64
-#elif defined(__ILP32__)
+#if defined(__aarch64__) && defined(__ILP32__)
 #  define __BITS_PER_LONG 32
 #else
-#  error "Neither LP64 nor ILP32: unsupported ABI in asm/bitsperlong.h"
+/*
+ * LP64. The AArch32 compat vDSO is built from these headers with an arm
+ * compiler (neither __LP64__ nor __ILP32__); it gets 64, as it always has.
+ */
+#  define __BITS_PER_LONG 64
 #endif
 
 #include <asm-generic/bitsperlong.h>
