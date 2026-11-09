@@ -45,8 +45,64 @@ statfs() and fstatfs() take the size of struct statfs as an argument.
 It is calculated differently in kernel and user spaces. So AARCH32 handlers
 are taken to handle it.
 
+fstatat64() and fstat64() use the AARCH32 handlers too, and write the
+AARCH32 struct stat64 (arch/arm64/include/asm/stat.h), not the generic one in
+include/uapi/asm-generic/stat.h. Their numbers are hidden from userspace with
+the time32 calls, unless __ILP32_WANT_TIME32_SYSCALLS is defined; use statx().
+
 struct rt_sigframe is redefined and contains struct compat_siginfo,
 as compat syscalls expect, and struct ilp32_ucontext, to handle
 AARCH64 register set and 32-bit userspace register representation.
 
 elf_gregset_t is taken from lp64 to handle registers properly.
+
+Seccomp and audit
+-----------------
+
+ILP32 tasks report their own arch value, AUDIT_ARCH_AARCH64ILP32 (0xd00000b7),
+defined in include/uapi/linux/audit.h as
+EM_AARCH64 | __AUDIT_ARCH_64BIT | __AUDIT_ARCH_LE |
+__AUDIT_ARCH_CONVENTION_AARCH64_ILP32 (0x10000000), the scheme MIPS uses for
+AUDIT_ARCH_MIPS64N32. AArch64 tasks keep AUDIT_ARCH_AARCH64 (0xc00000b7) and
+AArch32 tasks AUDIT_ARCH_ARM. The value appears in seccomp_data.arch, in si_arch
+of the SIGSYS a filter raises, in PTRACE_GET_SYSCALL_INFO and in audit records.
+It is not in the upstream kernel; a program built against headers without it
+can define it as above.
+
+The ILP32 syscall numbers are the asm-generic ones, like AArch64, but the
+table differs:
+
+- same number, 32-bit variant: 25 fcntl64, 43 statfs64, 44 fstatfs64,
+  45 truncate64, 46 ftruncate64, 62 llseek, 71 sendfile64, 79 fstatat64,
+  80 fstat64, 222 mmap2, 223 fadvise64_64;
+- ILP32 only, the time64 calls: 403 clock_gettime64, 404 clock_settime64,
+  405 clock_adjtime64, 406 clock_getres_time64, 407 clock_nanosleep_time64,
+  408 timer_gettime64, 409 timer_settime64, 410 timerfd_gettime64,
+  411 timerfd_settime64, 412 utimensat_time64, 413 pselect6_time64,
+  414 ppoll_time64, 416 io_pgetevents_time64, 417 recvmmsg_time64,
+  418 mq_timedsend_time64, 419 mq_timedreceive_time64, 420 semtimedop_time64,
+  421 rt_sigtimedwait_time64, 422 futex_time64,
+  423 sched_rr_get_interval_time64;
+- AArch64 only: 38 renameat, 163 getrlimit, 164 setrlimit;
+- the time32 calls (113 clock_gettime and the others with a 32-bit time_t)
+  exist only with CONFIG_COMPAT_32BIT_TIME.
+
+A filter must therefore check seccomp_data.arch before it looks at the
+syscall number. A filter written only for AUDIT_ARCH_AARCH64 treats an ILP32
+task as an unknown arch and applies its action for that case, which usually
+kills the task; to allow ILP32 programs, give AUDIT_ARCH_AARCH64ILP32 its own
+branch with the numbers above. libseccomp and systemd need ILP32 support for
+this arch to do the same.
+
+The seccomp action cache has no bitmap for this arch, so filters always run
+for ILP32 tasks.
+
+Kernels before this change (in linux-ilp32, before ilp32-6.12.y 0f465af64b)
+reported AUDIT_ARCH_AARCH64 for ILP32 tasks. There, a deny-list filter written
+for AArch64 did not stop the ILP32-only calls above, for example
+clock_settime64 when clock_settime was denied, and an arch check could not
+exclude ILP32. Userspace that hard-codes the arch value must match the kernel:
+with one of them older than the other, its own filter kills or refuses it.
+
+When a filter acts on an ILP32 task, audit logs it with type=1326 and
+arch=d00000b7 together with the syscall number.
