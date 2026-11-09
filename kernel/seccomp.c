@@ -373,10 +373,17 @@ static inline bool seccomp_cache_check_allow(const struct seccomp_filter *sfilte
 	const struct action_cache *cache = &sfilter->cache;
 
 #ifndef SECCOMP_ARCH_COMPAT
+#ifndef SECCOMP_ARCH_UNCACHED
 	/* A native-only architecture doesn't need to check sd->arch. */
 	return seccomp_cache_check_allow_bitmap(cache->allow_native,
 						SECCOMP_ARCH_NATIVE_NR,
 						syscall_nr);
+#else
+	if (likely(sd->arch == SECCOMP_ARCH_NATIVE))
+		return seccomp_cache_check_allow_bitmap(cache->allow_native,
+							SECCOMP_ARCH_NATIVE_NR,
+							syscall_nr);
+#endif
 #else
 	if (likely(sd->arch == SECCOMP_ARCH_NATIVE))
 		return seccomp_cache_check_allow_bitmap(cache->allow_native,
@@ -387,6 +394,12 @@ static inline bool seccomp_cache_check_allow(const struct seccomp_filter *sfilte
 							SECCOMP_ARCH_COMPAT_NR,
 							syscall_nr);
 #endif /* SECCOMP_ARCH_COMPAT */
+
+#ifdef SECCOMP_ARCH_UNCACHED
+	/* An arch value without a bitmap: always run the filters */
+	if (sd->arch == SECCOMP_ARCH_UNCACHED)
+		return false;
+#endif
 
 	WARN_ON_ONCE(true);
 	return false;

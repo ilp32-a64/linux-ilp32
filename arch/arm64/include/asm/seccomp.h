@@ -53,6 +53,10 @@ static inline const int *get_compat_mode1_syscalls(void)
 #define SECCOMP_ARCH_NATIVE		AUDIT_ARCH_AARCH64
 #define SECCOMP_ARCH_NATIVE_NR		NR_syscalls
 #define SECCOMP_ARCH_NATIVE_NAME	"aarch64"
+#ifdef CONFIG_ARM64_ILP32
+/* ILP32 tasks have their own arch value and no action cache */
+# define SECCOMP_ARCH_UNCACHED		AUDIT_ARCH_AARCH64ILP32
+#endif
 #ifdef CONFIG_AARCH32_EL0
 #include <asm/unistd_compat_32.h>
 # define SECCOMP_ARCH_COMPAT		AUDIT_ARCH_ARM

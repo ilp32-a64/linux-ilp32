@@ -86,6 +86,16 @@ static inline int syscall_get_arch(struct task_struct *task)
 	if (is_a32_compat_thread(task_thread_info(task)))
 		return AUDIT_ARCH_ARM;
 
+	/*
+	 * ILP32 uses the asm-generic numbers like AArch64, but its own table: 32-bit
+	 * variants on 11 numbers, the time64 calls 403-423, no renameat, getrlimit or
+	 * setrlimit. A filter written for AArch64 must not apply to it unchanged, so
+	 * ILP32 has its own value; it keeps __AUDIT_ARCH_64BIT so that audit does not
+	 * classify its calls with the AArch32 compat tables.
+	 */
+	if (is_ilp32_compat_thread(task_thread_info(task)))
+		return AUDIT_ARCH_AARCH64ILP32;
+
 	return AUDIT_ARCH_AARCH64;
 }
 
